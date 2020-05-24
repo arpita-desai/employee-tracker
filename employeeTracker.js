@@ -14,14 +14,17 @@ connection.connect(err => {
     if(err) throw err;
 
     console.log(`Connection created on ${connection.threadId}`);
+    getStarted();
 });
 
 getStarted = () => {
     return inquirer.prompt({
         name: "choice",
         type: "list",
+        message: "What do you like to do?",
         choices: [
             "View all employees",
+            "View all departments",
             "View all employees by department",
             "View all employees by manager",
             "Add employee",
@@ -31,12 +34,16 @@ getStarted = () => {
             "View all roles",
             "Add role",
             "Remove role",
-            "exit"
+            "Exit"
         ]
     }).then(ans => {
         switch(ans.choice) {
             case "View all employees":
             viewAllEmp();
+            break;
+
+            case "View all departments":
+            viewAllDep();
             break;
 
             case "View all employees by department":
@@ -84,7 +91,139 @@ getStarted = () => {
 };
 
 const viewAllEmp = () => {
-    const query = connection.query(
-        `SELECT `
-    )
-}
+    const q = `SELECT e.emp_id, e.first_name, e.last_name, e.manager_id, 
+    r.title, r.salary, d.department_name
+    FROM ((employee e
+    INNER JOIN roles r ON e.role_id = r.role_id)
+    INNER JOIN department d ON d.department_id = r.department_id)`;
+    const query = connection.query(q,(err, res) => {
+        if(err) throw err;
+
+       console.table(res);
+        getStarted();
+    });
+};
+
+const viewAllDep = () => {
+    const q = `SELECT * FROM department`;
+    const query = connection.query(q,(err, res) => {
+        if(err) throw err;
+
+       console.table(res);
+        getStarted();
+    });
+};
+
+const viewRoles = () => {
+    const q = `SELECT * FROM roles`;
+    const query = connection.query(q,(err, res) => {
+        if(err) throw err;
+
+       console.table(res);
+        getStarted();
+    });
+};
+
+// const removeEmp = () => {
+
+//     const q = `SELECT first_name FROM employee`;
+//     const query = connection.query(q,(err, res) => {
+//         if(err) throw err;
+//         const emp_name = [];
+
+//         emp_name.push(res);
+//         console.log(emp_name);
+        
+//     });
+
+//     return inquirer.prompt([
+//        {
+//         name: "Which employee you want to remove?",
+//         type: "list",
+//         choices: "",
+//        }, 
+//     ]).then(function() {
+//         const q = `SELECT * FROM roles`;
+//     const query = connection.query(q,(err, res) => {
+//         if(err) throw err;
+
+//        console.table(res);
+//         getStarted();
+//     });
+// });
+// };
+
+const addEmp = () => {
+    inquirer.prompt([
+        {
+            name: "fName",
+            message: "Enter first name of employee"
+        },
+        {
+            name: "lName",
+            message: "Enter last name of employee"
+        },
+        {   
+            type: "list",
+            name: "role",
+            message: "Enter first role of employee",
+            choices: [
+                "Lead Engineer",
+                "Software Engineer",
+                "Affiliate",
+                "Accountant",
+                "Lawyer",
+                "Marketing Manager"
+            ]
+        },
+        {
+            name: "managerName",
+            message: "Enter first name of your manager if there"
+        }
+    ]).then(answers => {
+        
+        connection.query(
+            `SELECT role_id FROM roles WHERE title = '${answers.role}'`,
+            // "SELECT role_id FROM roles WHERE ?",
+            // {
+            //     title: "answers.role"
+            // },
+            (err, res) => {
+                if (err) throw err;
+
+                var role_id = res[0].role_id;
+                console.log(role_id);
+            }
+            
+        );
+        if(answers.managerName){
+        connection.query(
+            `SELECT emp_id FROM employee WHERE first_name = '${answers.managerName}'`,
+            (err, res) => {
+                if (err) {
+                    console.log("No such manager exists");
+                    
+                } else {
+                    var emp_id = res[0].emp_id;
+                }    
+                
+               console.log(emp_id);
+            }
+           
+        );
+        }
+       // console.log(emp_id);
+        // connection.query(
+        //     `INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ("${answers.fName}","${answers.lName}","${emp_id}","${role_id}")`,
+        //     (err, res) => {
+        //         if (err) throw err;
+
+        //         console.log("Data inserted in table.")
+        //     }
+        // );
+       
+     }); 
+    
+};
+
+
