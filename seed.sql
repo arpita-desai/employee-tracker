@@ -16,7 +16,6 @@ INSERT INTO roles (title, salary, department_id) VALUES ("Marketing Manager", 70
 
 
 
-INSERT INTO employee ç
 INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ("William","Adam",1,3);
 INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ("Tom","Suh",null,2);
 INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ("May","Hume",null,1);

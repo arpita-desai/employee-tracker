@@ -22,6 +22,12 @@ CREATE TABLE employee(
     FOREIGN KEY (manager_id) REFERENCES employee(emp_id)
 );
 
+
+
+
+
+
+
 SELECT e.emp_id, e.first_name, e.last_name, e.manager_id, 
 r.title, r.salary, d.department_name
 FROM ((employee e
